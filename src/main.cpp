@@ -93,6 +93,7 @@ void Drivercontrol(){
 bool PID_enable = 1, PID_reset = 1;
 PID leftWheelPID(0.3, 0, 0), rightWheelPID(0.3, 0, 0), turnPID(0.3, 0, 0);
 double distances = 0, rotations = 0, angles = 0, turnPower = 0;
+int speed = 100;
 
 int PID_run(){
   while(PID_enable){
@@ -107,13 +108,13 @@ int PID_run(){
     rotations += turnPID.motorPower;
 
     leftWheelPID.desired_position = inchesToDegrees(distances) + rotations;
-    rightWheelPID.desired_position = inchesToDegrees(distances) - turnPID.motorPower;
+    rightWheelPID.desired_position = inchesToDegrees(distances) - rotations;
 
     leftWheelPID.update(LeftWheel.position(degrees));
     rightWheelPID.update(RightWheel.position(degrees));
 
-    LeftWheel.setVelocity(leftWheelPID.motorPower, percent);
-    RightWheel.setVelocity(rightWheelPID.motorPower, percent);
+    LeftWheel.setVelocity(leftWheelPID.motorPower * speed / 100, percent);
+    RightWheel.setVelocity(rightWheelPID.motorPower * speed / 100, percent);
 
     LeftWheel.spin(forward);
     RightWheel.spin(forward);
@@ -126,11 +127,12 @@ int PID_run(){
 void Autonomous(){
   task PID_task = task(PID_run);
   /*
-  distances += 5 // move 5 inches to forward;
-  distances -= 5 // move 5 inches to backward;
+  distances += 5; // move 5 inches to forward;
+  distances -= 5; // move 5 inches to backward;
   angles = 90; // turn to left;
   angles = -90; // turn to right;
   angles += 45; // turn 45 degrees to left side;
+  speed = 80; // 80 percent speed
   */
 }
 
